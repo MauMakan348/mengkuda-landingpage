@@ -1,0 +1,79 @@
+.bg-nav {
+    background-image: url(/app/public/images/logo-mengkuda.png);
+    background-size: contain ;
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+body {
+background-color: rgb(156, 165, 162);
+}
+
+body.header.nav {
+    font-family: 'montserrat';
+}
+
+.btn-red {
+    background: linear-gradient(to right, #dc5f00, #cf0a0a);
+    color: white;
+}
+.btn-red:hover{
+    background: white;
+    color: #cf0a0a;
+}
+
+.hero {
+    height: 87vh;
+    /* width: 100%; */
+    background: 
+    linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)),
+    url('/app/public/images/horse-dringking.gif');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
+}
+
+
+/* section-3 */
+/* animation */
+@keyframes scrollRight {
+    0%   { transform: translateX(-50%); }
+    100% { transform: translateX(0%); }
+}
+@keyframes scrollLeft {
+    0%   { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+}
+.gmbr-track.to-right {
+    animation: scrollRight 120s linear infinite alternate;
+}
+.gmbr-track.to-left {
+    animation: scrollLeft 120s linear infinite alternate;
+}
+.gmbr-track {
+    display: inline-flex;
+    gap: 14px;
+    will-change: transform;
+    white-space: nowrap;
+}
+.gmbr-wrapper {
+    overflow: hidden;
+    width: 100%;
+}
+/* detail kecil */
+/* .gmbr-bg {
+    position: relative;
+}
+.gmbr-bg .text-white {
+    position: relative;
+    z-index: 2;
+}
+.gmbr-bg::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+    pointer-events: none;
+} */

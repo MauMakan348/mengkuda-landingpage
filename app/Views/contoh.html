@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flowstate — Deep Work, Finally Solved</title>
+  <meta name="description" content="Flowstate helps knowledge workers eliminate distractions, enter deep focus faster, and ship more meaningful work — every single day." />
+  <meta property="og:title" content="Flowstate — Deep Work, Finally Solved" />
+  <meta property="og:description" content="The AI-powered focus companion for people who do real work." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* ─── Design Tokens ─── */
+    :root {
+      --ink:      #0c0c0f;
+      --paper:    #f5f2eb;
+      --gold:     #c9a84c;
+      --gold-lt:  #e8d5a3;
+      --rust:     #c0432a;
+      --sage:     #3d6b5e;
+      --mist:     #e8ede8;
+      --line:     rgba(201,168,76,0.25);
+    }
+
+    /* ─── Base ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--ink);
+      color: var(--paper);
+      overflow-x: hidden;
+    }
+
+    /* ─── Typography ─── */
+    .serif   { font-family: 'DM Serif Display', serif; }
+    .serif-i { font-family: 'DM Serif Display', serif; font-style: italic; }
+
+    /* ─── Noise texture overlay ─── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-repeat: repeat;
+      background-size: 256px 256px;
+      opacity: 0.6;
+    }
+    section, nav, footer { position: relative; z-index: 1; }
+
+    /* ─── Gold line ─── */
+    .rule { border-color: var(--line); }
+
+    /* ─── CTA Button ─── */
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--gold);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600; font-size: 0.95rem; letter-spacing: 0.02em;
+      padding: 0.85rem 2rem; border-radius: 2px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      text-decoration: none;
+      border: none; cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: var(--gold-lt);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 32px rgba(201,168,76,0.3);
+    }
+    .btn-ghost {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: transparent;
+      color: var(--paper);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500; font-size: 0.9rem;
+      padding: 0.8rem 1.6rem; border-radius: 2px;
+      border: 1px solid rgba(245,242,235,0.25);
+      transition: border-color 0.2s, background 0.2s;
+      text-decoration: none; cursor: pointer;
+    }
+    .btn-ghost:hover { border-color: var(--gold); background: rgba(201,168,76,0.08); }
+
+    /* ─── Animations ─── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    @keyframes pulse-ring {
+      0%   { transform: scale(1); opacity: 0.5; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+    .anim-1 { animation: fadeUp 0.7s ease both; }
+    .anim-2 { animation: fadeUp 0.7s 0.15s ease both; }
+    .anim-3 { animation: fadeUp 0.7s 0.3s ease both; }
+    .anim-4 { animation: fadeUp 0.7s 0.45s ease both; }
+    .float  { animation: float 5s ease-in-out infinite; }
+
+    /* ─── Hero visual ─── */
+    .hero-card {
+      background: rgba(245,242,235,0.04);
+      border: 1px solid rgba(201,168,76,0.2);
+      border-radius: 4px;
+      backdrop-filter: blur(4px);
+    }
+    .glow-gold {
+      box-shadow: 0 0 80px rgba(201,168,76,0.15), 0 0 120px rgba(201,168,76,0.07);
+    }
+
+    /* ─── Stat bar ─── */
+    .stat-bar {
+      border-left: 2px solid var(--gold);
+      padding-left: 1rem;
+    }
+
+    /* ─── Testimonial card ─── */
+    .tcard {
+      background: rgba(245,242,235,0.04);
+      border: 1px solid rgba(245,242,235,0.1);
+      border-radius: 3px;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .tcard:hover { border-color: rgba(201,168,76,0.4); background: rgba(201,168,76,0.05); }
+
+    /* ─── Step connector ─── */
+    .step-line {
+      position: absolute; top: 1.5rem; left: calc(50% + 1.5rem);
+      width: calc(100% - 3rem); height: 1px;
+      background: linear-gradient(90deg, var(--gold) 0%, transparent 100%);
+    }
+
+    /* ─── Problem card ─── */
+    .prob-card {
+      border-top: 1px solid rgba(245,242,235,0.1);
+      padding-top: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .prob-card:hover { border-color: var(--rust); }
+
+    /* ─── Logo strip ─── */
+    .logo-item {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.05rem; letter-spacing: 0.08em;
+      color: rgba(245,242,235,0.35);
+      transition: color 0.2s;
+    }
+    .logo-item:hover { color: rgba(245,242,235,0.7); }
+
+    /* ─── Nav ─── */
+    .nav-blur {
+      backdrop-filter: blur(16px);
+      background: rgba(12,12,15,0.8);
+      border-bottom: 1px solid rgba(201,168,76,0.1);
+    }
+
+    /* ─── Benefit icon wrap ─── */
+    .icon-wrap {
+      width: 2.5rem; height: 2.5rem;
+      border: 1px solid rgba(201,168,76,0.35);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gold); font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    /* ─── Mobile responsive helpers ─── */
+    @media (max-width: 768px) {
+      .step-line { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════
+     NAV
+═══════════════════════════════════════════════ -->
+<nav class="nav-blur fixed top-0 left-0 right-0 z-50">
+  <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <!-- Logo -->
+    <a href="#" class="serif text-xl tracking-wide" style="color:var(--gold)">Flowstate</a>
+
+    <!-- Links (hidden on mobile) -->
+    <div class="hidden md:flex items-center gap-8 text-sm" style="color:rgba(245,242,235,0.6)">
+      <a href="#problem"  class="hover:text-white transition-colors">Why it matters</a>
+      <a href="#solution" class="hover:text-white transition-colors">How it works</a>
+      <a href="#proof"    class="hover:text-white transition-colors">Results</a>
+    </div>
+
+    <!-- CTA -->
+    <a href="#cta" class="btn-primary" style="padding:0.6rem 1.4rem; font-size:0.85rem">Start free</a>
+  </div>
+</nav>
+
+
+<!-- ═══════════════════════════════════════════════
+     HERO
+═══════════════════════════════════════════════ -->
+<section id="hero" style="padding: 9rem 1.5rem 6rem; max-width:72rem; margin:0 auto;">
+  <div class="flex flex-col lg:flex-row items-center gap-16">
+
+    <!-- Copy -->
+    <div class="flex-1 text-center lg:text-left">
+      <!-- Eyebrow -->
+      <div class="anim-1 inline-flex items-center gap-2 mb-6"
+           style="border:1px solid var(--line); border-radius:2px; padding:0.35rem 0.9rem; font-size:0.8rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--gold);">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--gold);display:inline-block;position:relative;">
+          <span style="position:absolute;inset:0;border-radius:50%;background:var(--gold);animation:pulse-ring 1.6s ease infinite;"></span>
+        </span>
+        Now in public beta
+      </div>
+
+      <!-- Headline -->
+      <h1 class="serif anim-2 leading-none mb-6"
+          style="font-size:clamp(2.8rem,7vw,5.5rem); letter-spacing:-0.01em;">
+        Stop fighting<br/>
+        <span class="serif-i" style="color:var(--gold);">your own mind</span><br/>
+        to get work done.
+      </h1>
+
+      <!-- Sub -->
+      <p class="anim-3 mb-10 leading-relaxed"
+         style="font-size:1.15rem; color:rgba(245,242,235,0.65); max-width:36rem; margin-left:auto; margin-right:auto;">
+        Flowstate learns how you work, blocks what derails you, and surfaces exactly what you need — so every session ends with something you're proud of.
+      </p>
+
+      <!-- Actions -->
+      <div class="anim-4 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+        <a href="#cta" class="btn-primary" style="font-size:1rem; padding:1rem 2.2rem;">
+          Get early access — it's free
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </a>
+        <a href="#how" class="btn-ghost">See how it works</a>
+      </div>
+
+      <!-- Social nudge -->
+      <p class="anim-4 mt-5 text-sm" style="color:rgba(245,242,235,0.4);">
+        Joined by <strong style="color:rgba(245,242,235,0.7)">4,200+</strong> designers, engineers &amp; writers — no credit card required.
+      </p>
+    </div>
+
+    <!-- Hero Visual -->
+    <div class="flex-1 w-full max-w-lg float glow-gold">
+      <div class="hero-card p-6 space-y-4" role="img" aria-label="Flowstate app dashboard preview">
+        <!-- Fake top bar -->
+        <div class="flex items-center gap-2 mb-2">
+          <span style="width:10px;height:10px;border-radius:50%;background:var(--rust);opacity:0.8;"></span>
+          <span style="width:10px;height:10px;border-radius:50%;background:var(--gold);opacity:0.5;"></span>
+          <span style="width:10px;height:10px;border-radius:50%;background:var(--sage);opacity:0.6;"></span>
+          <span style="flex:1;height:1px;background:rgba(245,242,235,0.08);margin-left:0.5rem;"></span>
+          <span class="text-xs" style="color:rgba(245,242,235,0.3); letter-spacing:0.05em;">DEEP FOCUS — 47:23</span>
+        </div>
+
+        <!-- Focus ring -->
+        <div class="flex justify-center py-4">
+          <div style="position:relative; width:120px; height:120px;">
+            <svg viewBox="0 0 120 120" style="width:100%;height:100%;transform:rotate(-90deg)">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="rgba(245,242,235,0.06)" stroke-width="6"/>
+              <circle cx="60" cy="60" r="52" fill="none" stroke="var(--gold)" stroke-width="6"
+                      stroke-dasharray="326.7" stroke-dashoffset="90" stroke-linecap="round"/>
+            </svg>
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+              <span class="serif" style="font-size:1.6rem;color:var(--gold);">73%</span>
+              <span style="font-size:0.65rem;color:rgba(245,242,235,0.4);letter-spacing:0.1em;text-transform:uppercase;">focused</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current task -->
+        <div style="background:rgba(245,242,235,0.05);border-radius:2px;padding:0.75rem 1rem;border-left:2px solid var(--gold);">
+          <p style="font-size:0.7rem;color:rgba(245,242,235,0.35);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.3rem;">Current task</p>
+          <p style="font-size:0.95rem;color:var(--paper);">Finalize Q4 product brief</p>
+        </div>
+
+        <!-- Blocked sites -->
+        <div class="space-y-2">
+          <p style="font-size:0.7rem;color:rgba(245,242,235,0.35);letter-spacing:0.1em;text-transform:uppercase;">Distractions blocked today</p>
+          <div class="flex gap-2 flex-wrap">
+            <span style="font-size:0.75rem;padding:0.2rem 0.6rem;border:1px solid rgba(192,67,42,0.4);border-radius:2px;color:rgba(192,67,42,0.8);">Twitter</span>
+            <span style="font-size:0.75rem;padding:0.2rem 0.6rem;border:1px solid rgba(192,67,42,0.4);border-radius:2px;color:rgba(192,67,42,0.8);">Slack (non-urgent)</span>
+            <span style="font-size:0.75rem;padding:0.2rem 0.6rem;border:1px solid rgba(192,67,42,0.4);border-radius:2px;color:rgba(192,67,42,0.8);">YouTube</span>
+            <span style="font-size:0.75rem;padding:0.2rem 0.6rem;border:1px solid rgba(192,67,42,0.4);border-radius:2px;color:rgba(192,67,42,0.8);">+18 more</span>
+          </div>
+        </div>
+
+        <!-- AI insight -->
+        <div style="background:rgba(61,107,94,0.15);border:1px solid rgba(61,107,94,0.35);border-radius:2px;padding:0.75rem 1rem;">
+          <p style="font-size:0.8rem;color:rgba(245,242,235,0.65);">
+            <span style="color:var(--sage);font-weight:600;">AI insight:</span> Your best focus window starts in 14 min. Schedule deep work now.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     LOGO STRIP
+═══════════════════════════════════════════════ -->
+<div style="border-top:1px solid rgba(245,242,235,0.07); border-bottom:1px solid rgba(245,242,235,0.07); padding:2rem 1.5rem;">
+  <div class="max-w-5xl mx-auto">
+    <p class="text-center text-xs mb-5 tracking-widest uppercase" style="color:rgba(245,242,235,0.3);">Trusted by teams at</p>
+    <div class="flex flex-wrap justify-center items-center gap-x-10 gap-y-4">
+      <span class="logo-item">Notion</span>
+      <span class="logo-item">Linear</span>
+      <span class="logo-item">Figma</span>
+      <span class="logo-item">Vercel</span>
+      <span class="logo-item">Loom</span>
+      <span class="logo-item">Stripe</span>
+      <span class="logo-item">Arc</span>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     PROBLEM
+═══════════════════════════════════════════════ -->
+<section id="problem" style="padding:7rem 1.5rem; max-width:68rem; margin:0 auto;">
+  <div class="text-center mb-16">
+    <p class="text-xs tracking-widest uppercase mb-4" style="color:var(--gold); letter-spacing:0.2em;">The reality</p>
+    <h2 class="serif leading-tight" style="font-size:clamp(2rem,5vw,3.8rem);">
+      You're not lazy.<br/>
+      <span class="serif-i" style="color:rgba(245,242,235,0.5);">Your environment is broken.</span>
+    </h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-10">
+
+    <div class="prob-card space-y-3">
+      <span style="font-size:1.5rem;">🔔</span>
+      <h3 class="serif text-xl">You start; the world interrupts.</h3>
+      <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+        A Slack ping. An email badge. A tab that "just needs a quick check." By the time you're back, 40 minutes are gone and you've forgotten where you were.
+      </p>
+    </div>
+
+    <div class="prob-card space-y-3">
+      <span style="font-size:1.5rem;">🧠</span>
+      <h3 class="serif text-xl">Decision fatigue kills momentum.</h3>
+      <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+        "What should I work on?" is a question you answer 30 times a day — and each answer drains mental energy you could've used to actually do the work.
+      </p>
+    </div>
+
+    <div class="prob-card space-y-3">
+      <span style="font-size:1.5rem;">📉</span>
+      <h3 class="serif text-xl">Long days, thin output.</h3>
+      <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+        You worked 9 hours but shipped almost nothing. The gap between busyness and actual progress grows wider — and nobody's talking about why.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Stat callout -->
+  <div class="mt-16 flex flex-col sm:flex-row justify-center gap-12 text-center">
+    <div class="stat-bar">
+      <p class="serif text-4xl" style="color:var(--gold);">2.1 hrs</p>
+      <p class="text-sm mt-1" style="color:rgba(245,242,235,0.45);">Average daily deep work — for most knowledge workers</p>
+    </div>
+    <div class="stat-bar">
+      <p class="serif text-4xl" style="color:var(--gold);">23 min</p>
+      <p class="text-sm mt-1" style="color:rgba(245,242,235,0.45);">Time to re-focus after a single interruption (UC Irvine)</p>
+    </div>
+    <div class="stat-bar">
+      <p class="serif text-4xl" style="color:var(--gold);">$588B</p>
+      <p class="text-sm mt-1" style="color:rgba(245,242,235,0.45);">Lost annually to workplace distraction (US alone)</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     SOLUTION
+═══════════════════════════════════════════════ -->
+<section id="solution" style="padding:6rem 1.5rem; background:rgba(245,242,235,0.03); border-top:1px solid rgba(201,168,76,0.1); border-bottom:1px solid rgba(201,168,76,0.1);">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-16">
+      <p class="text-xs tracking-widest uppercase mb-4" style="color:var(--gold); letter-spacing:0.2em;">The solution</p>
+      <h2 class="serif leading-tight" style="font-size:clamp(2rem,5vw,3.6rem);">
+        Your AI-powered<br/>
+        <span class="serif-i" style="color:var(--gold);">focus operating system.</span>
+      </h2>
+      <p class="mt-5 mx-auto" style="max-width:40rem; color:rgba(245,242,235,0.6); font-size:1.05rem; line-height:1.7;">
+        Flowstate doesn't just block distractions — it understands your work patterns, prioritizes intelligently, and builds the conditions where your best thinking thrives.
+      </p>
+    </div>
+
+    <!-- Benefits grid -->
+    <div class="grid md:grid-cols-2 gap-6">
+
+      <div class="tcard p-7 flex gap-5">
+        <div class="icon-wrap">🎯</div>
+        <div>
+          <h3 class="serif text-xl mb-2">Ship 3× more meaningful work</h3>
+          <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+            Flowstate surfaces your highest-leverage task at exactly the right moment — so you always know what to work on, without the agonizing deliberation.
+          </p>
+        </div>
+      </div>
+
+      <div class="tcard p-7 flex gap-5">
+        <div class="icon-wrap">🧘</div>
+        <div>
+          <h3 class="serif text-xl mb-2">Enter deep focus in under 3 minutes</h3>
+          <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+            AI-curated ambient environments, intelligent distraction blocking, and a single-task interface prime your brain to enter flow — fast.
+          </p>
+        </div>
+      </div>
+
+      <div class="tcard p-7 flex gap-5">
+        <div class="icon-wrap">📊</div>
+        <div>
+          <h3 class="serif text-xl mb-2">See exactly where your time really goes</h3>
+          <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+            Private, automatic time insights show your real productivity patterns — not vanity metrics, but the honest data that helps you improve.
+          </p>
+        </div>
+      </div>
+
+      <div class="tcard p-7 flex gap-5">
+        <div class="icon-wrap">🔁</div>
+        <div>
+          <h3 class="serif text-xl mb-2">Build focus habits that compound over time</h3>
+          <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.95rem;">
+            Flowstate adapts to your rhythms week over week, gradually expanding your deep work capacity — without burning you out.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     HOW IT WORKS
+═══════════════════════════════════════════════ -->
+<section id="how" style="padding:7rem 1.5rem; max-width:68rem; margin:0 auto;">
+  <div class="text-center mb-16">
+    <p class="text-xs tracking-widest uppercase mb-4" style="color:var(--gold); letter-spacing:0.2em;">How it works</p>
+    <h2 class="serif" style="font-size:clamp(2rem,5vw,3.4rem);">Three steps to your<br/><span class="serif-i" style="color:var(--gold);">most focused day.</span></h2>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-8 relative">
+
+    <!-- Step 1 -->
+    <div class="text-center space-y-4">
+      <div class="mx-auto flex items-center justify-center serif text-2xl"
+           style="width:3rem;height:3rem;border:1px solid var(--gold);border-radius:50%;color:var(--gold);">1</div>
+      <h3 class="serif text-xl">Connect &amp; calibrate</h3>
+      <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.9rem;">
+        Link your calendar, task manager, and browser in 90 seconds. Flowstate learns your workflow silently — no manual setup required.
+      </p>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="text-center space-y-4">
+      <div class="mx-auto flex items-center justify-center serif text-2xl"
+           style="width:3rem;height:3rem;border:1px solid var(--gold);border-radius:50%;color:var(--gold);">2</div>
+      <h3 class="serif text-xl">Start a focus session</h3>
+      <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.9rem;">
+        One click. Flowstate locks in on your most important task, blocks everything that isn't it, and sets your ideal environment.
+      </p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="text-center space-y-4">
+      <div class="mx-auto flex items-center justify-center serif text-2xl"
+           style="width:3rem;height:3rem;border:1px solid var(--gold);border-radius:50%;color:var(--gold);">3</div>
+      <h3 class="serif text-xl">Review &amp; improve</h3>
+      <p style="color:rgba(245,242,235,0.55); line-height:1.7; font-size:0.9rem;">
+        Each day ends with a private summary: what you accomplished, what derailed you, and one concrete way to do better tomorrow.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     SOCIAL PROOF
+═══════════════════════════════════════════════ -->
+<section id="proof" style="padding:6rem 1.5rem; background:rgba(245,242,235,0.03); border-top:1px solid rgba(201,168,76,0.1);">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-14">
+      <p class="text-xs tracking-widest uppercase mb-4" style="color:var(--gold); letter-spacing:0.2em;">Real results</p>
+      <h2 class="serif" style="font-size:clamp(2rem,4vw,3rem);">People who used to feel<br/><span class="serif-i" style="color:var(--gold);">overwhelmed now feel unstoppable.</span></h2>
+    </div>
+
+    <div class="grid md:grid-cols-3 gap-5">
+
+      <blockquote class="tcard p-6 space-y-4">
+        <p style="color:rgba(245,242,235,0.75); line-height:1.75; font-size:0.95rem;">
+          "I went from 90 minutes of actual focus per day to nearly 4 hours — in two weeks. My manager noticed before I even told them about Flowstate."
+        </p>
+        <footer class="flex items-center gap-3">
+          <div style="width:2.5rem;height:2.5rem;border-radius:50%;background:linear-gradient(135deg,var(--sage),var(--gold));opacity:0.8;flex-shrink:0;"></div>
+          <div>
+            <p style="font-weight:600;font-size:0.9rem;">Priya M.</p>
+            <p style="font-size:0.8rem;color:rgba(245,242,235,0.4);">Senior PM, fintech startup</p>
+          </div>
+        </footer>
+      </blockquote>
+
+      <blockquote class="tcard p-6 space-y-4">
+        <p style="color:rgba(245,242,235,0.75); line-height:1.75; font-size:0.95rem;">
+          "I write software for a living and I was checking my phone every 12 minutes. Flowstate felt uncomfortable for the first day — and then it felt like a superpower."
+        </p>
+        <footer class="flex items-center gap-3">
+          <div style="width:2.5rem;height:2.5rem;border-radius:50%;background:linear-gradient(135deg,var(--rust),var(--gold));opacity:0.8;flex-shrink:0;"></div>
+          <div>
+            <p style="font-weight:600;font-size:0.9rem;">Daniel K.</p>
+            <p style="font-size:0.8rem;color:rgba(245,242,235,0.4);">Staff Engineer, SaaS co.</p>
+          </div>
+        </footer>
+      </blockquote>
+
+      <blockquote class="tcard p-6 space-y-4">
+        <p style="color:rgba(245,242,235,0.75); line-height:1.75; font-size:0.95rem;">
+          "The daily review alone is worth it. Seeing in cold numbers how much Slack was destroying my afternoons finally gave me permission to close it."
+        </p>
+        <footer class="flex items-center gap-3">
+          <div style="width:2.5rem;height:2.5rem;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--sage));opacity:0.8;flex-shrink:0;"></div>
+          <div>
+            <p style="font-weight:600;font-size:0.9rem;">Sofia R.</p>
+            <p style="font-size:0.8rem;color:rgba(245,242,235,0.4);">Freelance designer &amp; writer</p>
+          </div>
+        </footer>
+      </blockquote>
+
+    </div>
+
+    <!-- Aggregate metrics -->
+    <div class="mt-14 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+      <div>
+        <p class="serif text-4xl" style="color:var(--gold);">4,200+</p>
+        <p class="text-sm mt-1" style="color:rgba(245,242,235,0.4);">Beta users</p>
+      </div>
+      <div>
+        <p class="serif text-4xl" style="color:var(--gold);">94%</p>
+        <p class="text-sm mt-1" style="color:rgba(245,242,235,0.4);">Still active after 30 days</p>
+      </div>
+      <div>
+        <p class="serif text-4xl" style="color:var(--gold);">3.4×</p>
+        <p class="text-sm mt-1" style="color:rgba(245,242,235,0.4);">Avg. deep work increase</p>
+      </div>
+      <div>
+        <p class="serif text-4xl" style="color:var(--gold);">4.9 ★</p>
+        <p class="text-sm mt-1" style="color:rgba(245,242,235,0.4);">Average rating</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     FINAL CTA
+═══════════════════════════════════════════════ -->
+<section id="cta" style="padding:8rem 1.5rem; text-align:center;">
+  <div class="max-w-2xl mx-auto space-y-8">
+    <p class="text-xs tracking-widest uppercase" style="color:var(--gold); letter-spacing:0.2em;">Limited beta access</p>
+    <h2 class="serif leading-tight" style="font-size:clamp(2.2rem,5vw,4rem);">
+      Your most productive year<br/>
+      <span class="serif-i" style="color:var(--gold);">starts right now.</span>
+    </h2>
+    <p style="color:rgba(245,242,235,0.6); font-size:1.05rem; line-height:1.75;">
+      Join 4,200+ knowledge workers who stopped fighting their environment and started doing work they're actually proud of.
+    </p>
+
+    <!-- Email form -->
+    <div class="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+      <input
+        type="email"
+        placeholder="your@email.com"
+        aria-label="Email address"
+        style="flex:1;padding:0.85rem 1.2rem;border:1px solid rgba(201,168,76,0.35);border-radius:2px;background:rgba(245,242,235,0.05);color:var(--paper);font-family:'DM Sans',sans-serif;font-size:0.95rem;outline:none;"
+        onfocus="this.style.borderColor='var(--gold)'"
+        onblur="this.style.borderColor='rgba(201,168,76,0.35)'"
+      />
+      <button class="btn-primary" style="white-space:nowrap;" onclick="handleSignup(this)">
+        Claim my spot
+        <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M2 7.5h11M9 3l4 4.5-4 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+
+    <!-- Trust signals -->
+    <div class="flex flex-wrap justify-center gap-6 text-sm" style="color:rgba(245,242,235,0.4);">
+      <span>✓ Free during beta</span>
+      <span>✓ No credit card required</span>
+      <span>✓ Cancel anytime</span>
+      <span>✓ Your data stays private</span>
+    </div>
+  </div>
+</section>
+
+
+<!-- ═══════════════════════════════════════════════
+     FOOTER
+═══════════════════════════════════════════════ -->
+<footer style="border-top:1px solid rgba(245,242,235,0.08); padding:2.5rem 1.5rem;">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+    <span class="serif text-lg" style="color:var(--gold)">Flowstate</span>
+    <div class="flex gap-6 text-sm" style="color:rgba(245,242,235,0.4)">
+      <a href="#" class="hover:text-white transition-colors">Privacy</a>
+      <a href="#" class="hover:text-white transition-colors">Terms</a>
+      <a href="#" class="hover:text-white transition-colors">Contact</a>
+    </div>
+    <p class="text-sm" style="color:rgba(245,242,235,0.25);">© 2026 Flowstate. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  /* Minimal JS — no frameworks */
+  function handleSignup(btn) {
+    const input = btn.previousElementSibling;
+    const email = input.value.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRe.test(email)) {
+      input.style.borderColor = 'var(--rust)';
+      input.focus();
+      return;
+    }
+    btn.textContent = '🎉 You\'re on the list!';
+    btn.style.background = 'var(--sage)';
+    btn.disabled = true;
+    input.disabled = true;
+  }
+
+  /* Subtle scroll-reveal via IntersectionObserver */
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.style.opacity = '1';
+        entry.target.style.transform = 'translateY(0)';
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  document.querySelectorAll('.tcard, .prob-card, .stat-bar').forEach(el => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(20px)';
+    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(el);
+  });
+</script>
+
+</body>
+</html>
